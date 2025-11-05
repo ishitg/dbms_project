@@ -1,12 +1,11 @@
-import express from 'express';
-import { pool } from '../db.js';
+import express from "express";
+import { pool } from "../db.js";
 const router = express.Router();
 
-
 // Seats with availability & price for a given event + section
-router.get('/:eventId/section/:sectionId', async (req, res) => {
-const { eventId, sectionId } = req.params;
-const q = `
+router.get("/:eventId/section/:sectionId", async (req, res) => {
+  const { eventId, sectionId } = req.params;
+  const q = `
 SELECT s.seat_id, s.row_label, s.seat_number,
 CASE
 WHEN b.booking_id IS NOT NULL THEN 'BOOKED'
@@ -23,13 +22,12 @@ LEFT JOIN holds h ON h.seat_id = s.seat_id AND h.event_id = $1 AND h.status='HEL
 WHERE s.section_id = $2
 ORDER BY s.row_label, s.seat_number;
 `;
-try {
-const { rows } = await pool.query(q, [eventId, sectionId]);
-res.json(rows);
-} catch (err) {
-res.status(500).json({ error: err.message });
-}
+  try {
+    const { rows } = await pool.query(q, [eventId, sectionId]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-
 
 export default router;
